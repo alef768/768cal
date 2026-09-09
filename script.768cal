@@ -1,0 +1,17 @@
+* This is a comment
+
+* Line 3
+* Line 4
+
+TXTIN "Enter radius of base cylinder (cm): "
+TEMPSET "radius"
+TEMPVAL "3.14159265"
+TEMPSET "pi"
+POW &radius& 2
+PROD &TEMPVAL& &pi&
+TEMPSET "base_area"
+
+TXTIN "Enter height of cylinder (cm): "
+PROD &base_area& &TEMPVAL&
+
+TXTOUT "Volume of cylinder: ~&TEMPVAL& cm3"
