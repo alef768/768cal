@@ -1,0 +1,32 @@
+* This is a comment
+
+* Line 3
+* Line 4
+
+TXTIN "Y or N? "
+TEMPSET "ANSWER"
+
+TEMPVAL "Y"
+@IF! == &ANSWER& 14
+TXTOUT "Answered Y"
+@ 21
+
+TEMPVAL "N"
+@IF! == &ANSWER& 19
+TXTOUT "Answered N"
+@ 21
+
+TXTOUT "Invalid answer!"
+@ 6
+
+TXTOUT "Your answer is &ANSWER&."
+
+TXTIN "Password: "
+TEMPSET "INPUT"
+
+TEMPVAL "1234"
+@IF == &INPUT& 32
+TXTOUT "Incorrect password!"
+@ 24
+
+TXTOUT "Correct password!"
