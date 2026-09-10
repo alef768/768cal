@@ -1,0 +1,3 @@
+TXTIN "Hi! What is your name? "
+TEMPSET name
+TXTOUT "It's nice to meet you, &name&!"
