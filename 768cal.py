@@ -62,15 +62,12 @@ def check_linetarget(linetarget):
 
 def compare(left, operator, right):
     # left usually TEMPVAL
-    print(repr(left), repr(operator), repr(right))
     try:
         left = float(left)
         right = float(right)
     except (ValueError, TypeError):
         left = str(left)
         right = str(right)
-
-    print(repr(left), repr(operator), repr(right))
 
     match operator:
         case "==":
