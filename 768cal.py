@@ -48,13 +48,20 @@ variables = {
     "TEMPVAL": "0",
     }
 
+points = {}
+
 ### FUNCTIONS
 ## HELPER FUNCS
 def check_linetarget(linetarget):
     try:
-        linetarget = int(linetarget)
-    except ValueError:
+        linetarget = float(linetarget)
+    except (ValueError, TypeError):
         raise ValueError("Number argument must be numeric!")
+
+    if not linetarget.is_integer():
+        raise ValueError("Number argument must be integer!")
+
+    linetarget = int(linetarget)
 
     if not 1 <= linetarget <= len(code):
         raise ValueError(f"Invalid line number {linetarget}!")
@@ -89,8 +96,16 @@ def eval_if(args, negate=False):
     args = sub_vars(args)
     operator = args[0]
     subject = args[1]
-    linetarget = check_linetarget(args[2])
+    linetarget = args[2]
     
+    if not linetarget.startswith("@"):
+        linetarget = check_linetarget(linetarget)
+    else:
+        point = linetarget[1:]
+        if not point in points:
+            raise ValueError(f"Point {point} not initialized!")
+        linetarget = points[point]
+        
     result = compare(variables["TEMPVAL"], operator, subject)
 
     if negate:
@@ -127,7 +142,23 @@ def comment(args, line_no):
     pass
 
 def goto(args, line_no):
-    return check_linetarget(args[0])
+    linetarget = sub_vars(args[0])
+    return check_linetarget(linetarget)
+
+def linefetch(args, line_no):
+    variables["TEMPVAL"] = line_no
+    return
+
+def pointsave(args, line_no):
+    return
+
+def pointload(args, line_no):
+    point = args[0]
+    if not point in points:
+        raise ValueError(
+            f"Unknown point {point}"
+        )
+    return int(points[point])
 
 def diff(args, line_no):
     if len(args) < 2:
@@ -257,6 +288,18 @@ run = {
         "func": goto,
         "argsno": 1,
         },
+    "@GET": {
+        "func": linefetch,
+        "argsno": 0,
+        },
+    "@<": {
+        "func": pointsave,
+        "argsno": 1,
+        },
+    "@>": {
+        "func": pointload,
+        "argsno": 1,
+        },
     "DIFF": {
         "func": diff,
         "argsno": 0,
@@ -347,31 +390,60 @@ def execute(instruction):
 ### INTERPRETER
 print(f"Running {path}\n")
 
-no = 1
-while no <= len(code):
-    line = code[no - 1]
-
+# @<
+crash = 0
+for no, line in enumerate(code, start=1):
     try:
         tokens = tokenize(line)
         instruction = parse(tokens, no)
-        if instruction is None:
-            no += 1
-            continue
         
-        lineto = execute(instruction)
-        if lineto is None:
-            no += 1
+        if instruction is None:
             continue
-        no = lineto
 
+        if instruction["keyword"] == "@<":
+            point = instruction["args"][0]
+            
+            if not point.isidentifier():
+                raise ValueError("Invalid point name!")
+
+            if point in points:
+                raise ValueError(f"Point {point} already initialized!")
+
+            points[point] = no + 1
     except KeyError as e:
         print(f"Error at line {no}: Invalid variable {e}")
+        crash = 1
         break
     except OverflowError as e:
         print(f"Error at line {no}: Value overflow!")
+        crash = 1
         break
     except Exception as e:
         print(f"Error at line {no}: {e}")
+        crash = 1
         break
+
+# MAIN
+no = 1
+if not crash:
+    while no <= len(code):
+        line = code[no - 1]
+
+        try:
+            tokens = tokenize(line)
+            instruction = parse(tokens, no)
+            if instruction is None:
+                no += 1
+                continue
+            
+            lineto = execute(instruction)
+            if lineto is None:
+                no += 1
+                continue
+            no = lineto
+
+        except Exception as e:
+            print(f"Error at line {no}: {e}")
+            break
 
 input(f"\nProgram finished... Press ENTER to exit...")
