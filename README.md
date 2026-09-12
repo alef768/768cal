@@ -289,7 +289,7 @@ TXTOUT "You can proceed to buy."
 
 If `TEMPVAL` is not greater than the budget, the program jumps to `Enoughbudget`.
 
-### What's next?
+## What's next?
 
 768cal is still being developed, and more features, improvements, and changes will be implemented in the future. The features mentioned above are the ones currently in 768cal. As new changes are added, this README will update accordingly... occasionally.
 
