@@ -21,7 +21,7 @@ For now, the main file is a Python file and pre-built executables will be availa
 8. The program will proceed to run your script.
 
 ## Programming 768cal
-Now, we will talk about the features, and keywords (available as of day 3) in this programming language.
+Now, we will talk about the features, and keywords (available as of day 3/0.1.0) in this programming language.
 
 ### Comments
 Turns the line into a comment, which the program ignores during runtime.
