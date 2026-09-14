@@ -21,7 +21,7 @@ For now, the main file is a Python file and pre-built executables will be availa
 8. The program will proceed to run your script.
 
 ## Programming 768cal
-Now, we will talk about the features, and keywords (available as of day 3/v0.1.0) in this programming language.
+Now, we will talk about the features, and keywords (available as of v0.2.0) in this programming language.
 
 ### Comments
 Turns the line into a comment, which the program ignores during runtime.
@@ -34,7 +34,7 @@ Turns the line into a comment, which the program ignores during runtime.
 `TXTOUT "Hello world!"`
 
 ### TEMPVAL
-`TEMPVAL` serves as the temporary value buffer used by 768cal. It stores values as strings, and operations convert those values to the required datatype when necessary.
+`TEMPVAL` serves as the temporary value buffer used by 768cal. It stores values of different types, and operations convert those values to the required datatype when necessary.
 
 `TEMPVAL "Value"`
 
@@ -77,7 +77,7 @@ TEMPSET "name"
 TXTOUT "It's nice to meet you, &name&!"
 ```
 
-### Math operations
+### Arithmetic operations
 #### SUM
 `SUM` returns the sum of all provided arguments (two or more), which will be recorded to `TEMPVAL`.
 
@@ -158,6 +158,172 @@ TXTOUT "&TEMPVAL&"
 
 Outputs `3.0`
 
+### Numeric modification operations
+#### +INV
+`+INV` returns the additive inverse of the specified value. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
++INV 0.5
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `-0.5`
+
+#### *INV
+`*INV` returns the multiplicative inverse of the specified value. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+*INV 0.5
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `2.0`
+
+#### ROUND
+`ROUND` rounds the specified value to the specified number of decimal places. It only requires 2 arguments, and the result will be recorded to `TEMPVAL`.
+
+```
+ROUND 3.14 1
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `3.1`
+
+#### FLOOR
+`FLOOR` returns the floor of the specified value. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+FLOOR 3.14
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `3.0`
+
+#### CEIL
+`CEIL` returns the ceiling of the specified value. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+CEIL 3.14
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `4.0`
+
+#### MIN
+`MIN` returns the minimum value out of the specified arguments. The result will be recorded to `TEMPVAL`.
+
+```
+MIN 3 1 2
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `1.0`
+
+#### MAX
+`MAX` returns the maximum value out of the specified arguments. The result will be recorded to `TEMPVAL`.
+
+```
+MAX 3 1 2
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `3.0`
+
+#### RAND
+`RAND` returns a random float from the specified range, and rounds it to N decimal places. The first argument specifies the lowest possible number, and the second specifying the highest. The third argument specifies N decimal places. It requires 3 arguments, and the result will be recorded to `TEMPVAL`.
+
+```
+RAND 3 5 2
+TXTOUT "&TEMPVAL&"
+```
+
+Example output: `3.42`
+
+###  String manipulation operations
+#### STRLEN
+`STRLEN` returns the length of the specified string. It will substitute the specified variable/s first, if provided. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL Foo
+TEMPSET name
+STRLEN "The name is &name&."
+TXTOUT "&TEMPVAL&"
+```
+
+`"The name is Foo."` is interpreted; outputs `16`
+
+#### STRUP
+`STRUP` returns the specified string with all uppercase letters. It will substitute the specified variable/s first, if provided. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL Foo
+TEMPSET name
+STRUP "The name is &name&."
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `THE NAME IS FOO.`
+
+#### STRLOW
+`STRLOW` returns the specified string with all lowercase letters. It will substitute the specified variable/s first, if provided. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL Foo
+TEMPSET name
+STRLOW "The name is &name&."
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `the name is foo.`
+
+#### STRCAP
+`STRCAP` returns the specified string with its first character capitalized and all remaining characters converted to lowercase. It will substitute the specified variable/s first, if provided. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL foo
+TEMPSET name
+STRCAP "&name& is the name."
+TXTOUT "&TEMPVAL&"
+```
+
+`"foo is the name."` is interpreted; outputs `Foo is the name.`
+
+#### STRTITLE
+`STRTITLE` returns the specified string as title case. It will substitute the specified variable/s first, if provided. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL foo
+TEMPSET name
+STRTITLE "&name& is the name."
+TXTOUT "&TEMPVAL&"
+```
+
+Outputs `Foo Is The Name.`
+
+#### STRCHAR
+`STRCHAR` returns the character at the specified position. It will substitute the specified variable/s first, if provided. It requires 2 arguments, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL foo
+TEMPSET name
+STRCHAR "&name& is the name." 2
+TXTOUT "&TEMPVAL&"
+```
+
+`"foo is the name."` is interpreted and specified letter number is 2nd character; outputs `o`
+
+#### STRSUB
+`STRSUB`, as the name suggests, returns the string with substituted variables. It only requires 1 argument, and the result will be recorded to `TEMPVAL`.
+
+```
+TEMPVAL foo
+TEMPSET name
+STRSUB "&name& is the name."
+TXTOUT "&TEMPVAL&"
+```
+
+outputs `foo is the name.`
+
 ### WAIT
 `WAIT` pauses the runtime for the specified amount of seconds. In this example:
 
@@ -172,6 +338,7 @@ The program waits for 1 second before displaying `1 second`.
 ### @
 `@` allows the program to jump to the specified line number. It also accepts variable substitution.
 
+###### NOTE: Line numbers shown in examples are for visual only and are not part of the language's syntax.
 ```
 1: TXTOUT "Line 1"
 2: @ 7
@@ -229,7 +396,7 @@ Outputs `1`
 5. `>=` / `TEMPVAL` is greater than or equal to
 6. `<=` / `TEMPVAL` is less than or equal to
 
-Its structure is as follows:
+If it cannot compare numerically, it will use lexicographical comparison. Its structure is as follows:
 
 `@IF <operator> <value> <destination>`
 
@@ -293,7 +460,7 @@ If `TEMPVAL` is not greater than the budget, the program jumps to `Enoughbudget`
 
 768cal is still being developed, and more features, improvements, and changes will be implemented in the future. The features mentioned above are the ones currently in 768cal. As new changes are added, this README will update accordingly... occasionally.
 
-As of now, planned features are about expanding math operations (+INV/*INV, ROUND/FLOOR/CEIL, MIN/MAX), and implementing string manipulation (STRLEN, STRCHAR, STRUP, STRLOW, etc.).
+As of now, planned updates are about fixing bugs.
 
 For now, expect bugs and, likely, changes to the language's syntax and behaviour.
 
