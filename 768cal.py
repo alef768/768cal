@@ -2,12 +2,24 @@ import math
 import shlex
 import sys
 import time
+import random
+
+def exit0(code=0):
+    input(f"\nProgram finished... Press ENTER to exit...")
+    sys.exit(code)
 
 ### OPEN SCRIPT
 content = ""
+argv_evaluated = False
 while True:
-    # request script path
-    path = input("Script path: ")
+    # script path
+    if argv_evaluated:
+        exit0(1)
+    if len(sys.argv) >= 2:
+        path = sys.argv[1]
+        argv_evaluated = True
+    else:
+        path = input("Script path: ")
 
     # process script path
     try:
@@ -33,6 +45,7 @@ while True:
 # print content
 verbose = input("Display processed details of script? NONE/ANY: ")
 if verbose:
+    print(f"\nRunning {path}")
     print("Raw contents:")
     print(content)
 
@@ -41,7 +54,7 @@ code = content.splitlines()
 if verbose:
     print("\nCode list:")
     print(code)
-    print()
+print()
 
 ### VARIABLES
 variables = {
@@ -138,6 +151,15 @@ def sub_vars(text):
     return text
 
 ## MAIN FUNCS
+def ceil(args, line_no):
+    args = sub_vars(args)
+    try:
+        number = float(args[0])
+    except (ValueError, TypeError):
+        raise ValueError("All math arguments must be numeric!")
+    
+    variables["TEMPVAL"] = -(number // -1)
+
 def comment(args, line_no):
     pass
 
@@ -171,12 +193,39 @@ def diff(args, line_no):
         args0.pop(1)
     variables["TEMPVAL"] = args0[0]
     return
+    
+def floor(args, line_no):
+    args = sub_vars(args)
+    try:
+        number = float(args[0])
+    except (ValueError, TypeError):
+        raise ValueError("All math arguments must be numeric!")
+    
+    variables["TEMPVAL"] = number // 1
 
 def if0(args, line_no):
     return eval_if(args)
 
 def ifnot(args, line_no):
     return eval_if(args, True)
+
+def max0(args, line_no):
+    if len(args) < 2:
+        raise ValueError(
+            f"MAX requires at least 2 arguments!"
+        )
+    args0 = mathargs(args)
+    variables["TEMPVAL"] = max(args0)
+    return
+
+def min0(args, line_no):
+    if len(args) < 2:
+        raise ValueError(
+            f"MIN requires at least 2 arguments!"
+        )
+    args0 = mathargs(args)
+    variables["TEMPVAL"] = min(args0)
+    return
 
 def pow0(args, line_no):
     args = sub_vars(args)
@@ -202,6 +251,16 @@ def prod(args, line_no):
         args0.pop(1)
     variables["TEMPVAL"] = args0[0]
     return
+    
+def prodinv(args, line_no):
+    args = sub_vars(args)
+    try:
+        number = float(args[0])
+        variables["TEMPVAL"] = 1 / number
+    except (ValueError, TypeError):
+        raise ValueError("All math arguments must be numeric!")
+    except ZeroDivisionError:
+        raise ZeroDivisionError("Cannot divide by zero!")
 
 def quot(args, line_no):
     if len(args) < 2:
@@ -217,6 +276,23 @@ def quot(args, line_no):
         raise ZeroDivisionError("Cannot divide by zero!")
     variables["TEMPVAL"] = args0[0]
     return
+
+def rand(args, line_no):
+    args = sub_vars(args)
+    
+    try:
+        lowest = float(args[0])
+        highest = float(args[1])
+        ndigits = int(float(args[2]))
+    except (ValueError, TypeError):
+        raise ValueError("All math arguments must be numeric!")
+    
+    if lowest > highest:
+        raise ValueError("Lowest value cannot exceed highest value!")
+
+    
+    randomval = random.uniform(lowest, highest)
+    variables["TEMPVAL"] = round(randomval, ndigits)
 
 def root(args, line_no):
     args = sub_vars(args)
@@ -240,6 +316,50 @@ def root(args, line_no):
     variables["TEMPVAL"] = number ** (1 / degree)
     return
 
+def round0(args, line_no):
+    args = sub_vars(args)
+    try:
+        number = float(args[0])
+        ndigits = int(float(args[1]))
+    except (ValueError, TypeError):
+        raise ValueError("All math arguments must be numeric!")
+
+    variables["TEMPVAL"] = round(number, ndigits)
+
+def strchar(args, line_no):
+    text = sub_vars(args[0])
+    try:
+        number = int(float(args[1])) - 1
+    except (ValueError, TypeError):
+        raise ValueError("Letter number argument must be numeric!")
+
+    variables["TEMPVAL"] = text[number]
+    return
+
+def strlen(args, line_no):
+    variables["TEMPVAL"] = len(sub_vars(args[0]))
+    return
+    
+def strup(args, line_no):
+    variables["TEMPVAL"] = sub_vars(args[0]).upper()
+    return
+    
+def strlow(args, line_no):
+    variables["TEMPVAL"] = sub_vars(args[0]).lower()
+    return
+
+def strcap(args, line_no):
+    variables["TEMPVAL"] = sub_vars(args[0]).capitalize()
+    return
+    
+def strtitle(args, line_no):
+    variables["TEMPVAL"] = sub_vars(args[0]).title()
+    return
+    
+def strsub(args, line_no):
+    variables["TEMPVAL"] = sub_vars(args[0])
+    return
+
 def sum0(args, line_no):
     if len(args) < 2:
         raise ValueError(
@@ -251,6 +371,15 @@ def sum0(args, line_no):
         args0.pop(1)
     variables["TEMPVAL"] = args0[0]
     return
+    
+def suminv(args, line_no):
+    args = sub_vars(args)
+    try:
+        number = float(args[0])
+    except (ValueError, TypeError):
+        raise ValueError("All math arguments must be numeric!")
+
+    variables["TEMPVAL"] = -number
 
 def tempset(args, line_no):
     if not args[0].isidentifier():
@@ -300,9 +429,17 @@ run = {
         "func": pointload,
         "argsno": 1,
         },
+    "CEIL": {
+        "func": ceil,
+        "argsno": 1,
+        },
     "DIFF": {
         "func": diff,
         "argsno": 0,
+        },
+    "FLOOR": {
+        "func": floor,
+        "argsno": 1,
         },
     "@IF": {
         "func": if0,
@@ -312,6 +449,14 @@ run = {
         "func": ifnot,
         "argsno": 3,
         },
+    "MAX": {
+        "func": max0,
+        "argsno": 0,
+        },
+    "MIN": {
+        "func": min0,
+        "argsno": 0,
+        },
     "POW": {
         "func": pow0,
         "argsno": 2,
@@ -320,17 +465,61 @@ run = {
         "func": prod,
         "argsno": 0,
         },
+    "*INV": {
+        "func": prodinv,
+        "argsno": 1,
+        },
     "QUOT": {
         "func": quot,
         "argsno": 0,
+        },
+    "RAND": {
+        "func": rand,
+        "argsno": 3,
         },
     "ROOT": {
         "func": root,
         "argsno": 2,
         },
+    "ROUND": {
+        "func": round0,
+        "argsno": 2,
+        },
+    "STRCHAR": {
+        "func": strchar,
+        "argsno": 2,
+        },
+    "STRLEN": {
+        "func": strlen,
+        "argsno": 1,
+        },
+    "STRUP": {
+        "func": strup,
+        "argsno": 1,
+        },
+    "STRLOW": {
+        "func": strlow,
+        "argsno": 1,
+        },
+    "STRCAP": {
+        "func": strcap,
+        "argsno": 1,
+        },
+    "STRTITLE": {
+        "func": strtitle,
+        "argsno": 1,
+        },
+    "STRSUB": {
+        "func": strsub,
+        "argsno": 1,
+        },
     "SUM": {
         "func": sum0,
         "argsno": 0,
+        },
+    "+INV": {
+        "func": suminv,
+        "argsno": 1,
         },
     "TEMPSET": {
         "func": tempset,
@@ -388,7 +577,6 @@ def execute(instruction):
     return run[keyword]["func"](args, line_no)
 
 ### INTERPRETER
-print(f"Running {path}\n")
 
 # @<
 crash = 0
@@ -446,4 +634,4 @@ if not crash:
             print(f"Error at line {no}: {e}")
             break
 
-input(f"\nProgram finished... Press ENTER to exit...")
+exit0(0)
