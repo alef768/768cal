@@ -168,14 +168,32 @@ def goto(args, line_no):
     return check_linetarget(linetarget)
 
 def linefetch(args, line_no):
-    variables["TEMPVAL"] = line_no
+    try:
+        linetarget = float(args[0])
+    except (ValueError, TypeError):
+        raise ValueError("Number argument must be numeric!")
+
+    if not linetarget.is_integer():
+        raise ValueError("Number argument must be integer!")
+       
+    linetarget = line_no + linetarget
+    variables["TEMPVAL"] = check_linetarget(linetarget)
     return
 
 def pointsave(args, line_no):
     return
 
 def pointload(args, line_no):
-    point = args[0]
+    # also allow variable substitution; for dynamic inputs such as
+    # ... say point saved as "FOOBAR"
+    # TXTIN "Which point destination?"
+    # TEMPSET "ANSWER"
+    # and the user inputs "FOOBAR"
+    # @> &ANSWER&
+    # the program may go to point with a name of the value of "ANSWER"
+    # this to make "functions" more possible
+    linetarget = sub_vars(args[0])
+    point = linetarget
     if not point in points:
         raise ValueError(
             f"Unknown point {point}"
@@ -407,7 +425,7 @@ def wait(args, line_no):
         raise ValueError("Number argument must be numeric!")
 
 ### KEYWORDS
-# argsno as 0 means no fixed amount of inputs
+# argsno as 0 means no fixed amount of inputs--None is no argument required
 run = {
     "*": {
         "func": comment,
@@ -419,7 +437,7 @@ run = {
         },
     "@GET": {
         "func": linefetch,
-        "argsno": 0,
+        "argsno": 1,
         },
     "@<": {
         "func": pointsave,
