@@ -338,7 +338,7 @@ The program waits for 1 second before displaying `1 second`.
 ### @
 `@` allows the program to jump to the specified line number. It also accepts variable substitution.
 
-###### NOTE: Line numbers shown in examples are for visual only and are not part of the language's syntax.
+(NOTE: Line numbers shown in examples are for visual only and are not part of the language's syntax.)
 ```
 1: TXTOUT "Line 1"
 2: @ 7
