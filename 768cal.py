@@ -597,59 +597,60 @@ def execute(instruction):
 ### INTERPRETER
 
 # @<
-crash = 0
-for no, line in enumerate(code, start=1):
-    try:
-        tokens = tokenize(line)
-        instruction = parse(tokens, no)
-        
-        if instruction is None:
-            continue
-
-        if instruction["keyword"] == "@<":
-            point = instruction["args"][0]
-            
-            if not point.isidentifier():
-                raise ValueError("Invalid point name!")
-
-            if point in points:
-                raise ValueError(f"Point {point} already initialized!")
-
-            points[point] = no + 1
-    except KeyError as e:
-        print(f"Error at line {no}: Invalid variable {e}")
-        crash = 1
-        break
-    except OverflowError as e:
-        print(f"Error at line {no}: Value overflow!")
-        crash = 1
-        break
-    except Exception as e:
-        print(f"Error at line {no}: {e}")
-        crash = 1
-        break
-
-# MAIN
-no = 1
-if not crash:
-    while no <= len(code):
-        line = code[no - 1]
-
+if __name__ == '__main__':
+    crash = 0
+    for no, line in enumerate(code, start=1):
         try:
             tokens = tokenize(line)
             instruction = parse(tokens, no)
-            if instruction is None:
-                no += 1
-                continue
             
-            lineto = execute(instruction)
-            if lineto is None:
-                no += 1
+            if instruction is None:
                 continue
-            no = lineto
 
+            if instruction["keyword"] == "@<":
+                point = instruction["args"][0]
+                
+                if not point.isidentifier():
+                    raise ValueError("Invalid point name!")
+
+                if point in points:
+                    raise ValueError(f"Point {point} already initialized!")
+
+                points[point] = no + 1
+        except KeyError as e:
+            print(f"Error at line {no}: Invalid variable {e}")
+            crash = 1
+            break
+        except OverflowError as e:
+            print(f"Error at line {no}: Value overflow!")
+            crash = 1
+            break
         except Exception as e:
             print(f"Error at line {no}: {e}")
+            crash = 1
             break
 
-exit0(0)
+    # MAIN
+    no = 1
+    if not crash:
+        while no <= len(code):
+            line = code[no - 1]
+
+            try:
+                tokens = tokenize(line)
+                instruction = parse(tokens, no)
+                if instruction is None:
+                    no += 1
+                    continue
+                
+                lineto = execute(instruction)
+                if lineto is None:
+                    no += 1
+                    continue
+                no = lineto
+
+            except Exception as e:
+                print(f"Error at line {no}: {e}")
+                break
+
+    exit0(0)
